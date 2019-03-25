@@ -48,7 +48,7 @@ Starting a Development Chain
 ---------------
 Luckily the pre-baked substrate node comes with the democracy module already installed, so we will not need to compile our own node for this tour. You can start a node with `substrate --dev` and connect to it with the polkadot UI.
 
-Scenario 1 -- Give Alice some free coins
+Scenario 1 -- Give Alice free tokens
 ----------------------------------------
 To get our feet wet, consider this scenario. Alice is a developer for our blockchain and she recently fixed a security-critical bug before it was exploited. Her fix prevented many grateful community members from being robbed. One such community member proposes that in appreciation Alice should be awarded 100 newly-minted tokens.
 
@@ -103,7 +103,18 @@ Navigating back to the interface, and executing the very first scenario above, w
 
 Scenario 2 -- Bob wants to be super user
 ----------------------------------------
+The dev chain (and the slightly customized chain we just created) includes the sudo module. sudo allows a single user, the "super user" to execute extrinsics with higher authority than usual. Essentially whoever is the super-user is the king of the blockchain. This module is super useful for building and debugging a blockchain, but not a great governance strategy in a public chain. Since we have it, let's use it as an example proposal.
 
+When the chain is launched, Alice is the super user. Bob, thinking he would be a better super user than Alice, proposes that he be the new super user. some of his friends think that's a good idea.
+
+### Referendum Outvoted
+This is just a simple exercise.
+
+### Alice cancels referendum
+by using her existing sudo capabilities
+
+### Over 50% support, but motion fails due to turnout bias
+Bob votes Aye, Charlie votes Nay, charlie has 51% vote, but turnout bias means motion fails anyway.
 
 Future Content
 --------------
