@@ -64,35 +64,41 @@ Scenario 1 -- Give Alice free tokens
 ----------------------------------------
 To get our feet wet, consider this scenario. Alice is a developer for our blockchain and she recently fixed a security-critical bug before it was exploited. Her fix prevented many grateful community members from being robbed. One such community member proposes that in appreciation Alice should be awarded 100 newly-minted tokens.
 
-We'll explore several ways the scenario could unfold from here, but first a word about timing, experimentation, and patience. As we explore these scenarios, we will use a live development chain and the [Polkadot-JS UI](https://github.com/polkadot-js/apps). It is likely that you will occasionally issue the extrinsics out of order, too quickly, or too slowly. It is likely that you will need to restart the scenario a few times before getting it right. While this can sometimes be frustrating, remember that this is how you learn. The more times you practice, the more familiar you will become with the democracy module. Remember you can change the block time by modifying your chainspec file if you need to.
+As we explore these scenarios, we will use a live development chain and the [Polkadot-JS UI](https://github.com/polkadot-js/apps). It is likely that you will occasionally issue the extrinsics out of order, too quickly, or too slowly. It is likely that you will need to restart the scenario a few times before getting it right. While this can sometimes be frustrating, remember that this is how you learn. The more times you practice, the more familiar you will become with the democracy module. Remember you can change the block time by modifying your chainspec file if you need to.
 
-### Only Cheap Charlie Proposes
-In the first scenario, Charlie proposes that Alice get the new tokens. Charlie, being a cheapskate, only supports the proposal with 5 tokens. This is less than the minimum deposit, so the proposal is immediately rejected.
+### Charlie proposes, Bob seconds, Referendum Passes
+This timing diagram is my attempt at illustrating that Bob makes the proposal, charlie seconds it, increasing it's weight. Once it becomes a referendum, Bob and Charlie both vote Aye, but Alice, humble as she is, votes Nay. Accordingly the motion passes.
 
-TODO timing diagram?
+![timing diagram](timing/1.png)
 
-Begin by going to the extrinsics tab in the UI, we can have charlie submit a proposal. ([Extrinsics](https://docs.substrate.dev/docs/glossary#section-extrinsic) are transactions and things like blocktime. In this case, just think transactions.)
+Begin by going to the extrinsics tab in the UI, we can have charlie submit a proposal. ([Extrinsics](https://docs.substrate.dev/docs/glossary#section-extrinsic) are transactions and things like blocktime. In this case, just think transactions.) In my screenshot, Charlie has chosen to lock up 1000 tokens to support this proposal.
 
 TODO screenshot
 
+On the democracy tab you can see the proposal now. Wait a few blocks and (as long as nobody else adds a more popular proposal!) it will be tabled as a referendum. You could go back to the extrinsics tab to cast your votes, but you've probably noticed there is a nice voting interface right here on the democracy tab. Go ahead and use it.
+
+Confirm for yourself that Alice has received the tokens once the referendum passes.
+
+### Only Cheap Charlie Proposes
+Let's see how the same situation unfolds when Carlie locks fewer tokens behind his proposal. Try the same scenario using only 5 tokens this time.
+
+TODO Rejected screenshot
+
 When the next block is added to the chain, we see that the extrinsic failed because Charlie didn't deposit enough tokens.
 
-### Charlie proposes, Bob seconds, Referendum Passes
-TODO
+### Exercise: Charlie proposes, No seconds, Referendum Fails
+Based on the title and the timing diagram, execute this scenario through the Polkadot UI.
 
-### Charlie proposes, No seconds, Referendum Fails
-TODO
-query how many tokens are locked up at this point
+![timing diagram](timing/2.png)
 
-### Charlie Proposes, Other proposal more popular
-TODO
+At any time you can query the blockchain and observe properties of the runtime. For example we can see how many proposals have been made so far. On the "Chain State" tab .....
+TODO Screenshot
 
-### Automating Scenarios
-For all the reasons we discussed earlier, always using UI interactively is tiresome and error-prone. We can automate scenarios like this by using the same polkadot-js api that we used in the introduction. While we won't dwell on this automation, here is an example of the previous scenario.
+### Exercise: Charlie Proposes, Other proposal more popular
+![timing daigram](timing/3.png)
 
-```javascript
-//TODO Write this together during peer-learning session
-```
+Execute this scenario with the Polkadot UI.
+
 
 Democracy Settings in the Chainspec
 -----------------------------------
@@ -115,20 +121,35 @@ Navigating back to the interface, and executing the very first scenario above, w
 
 Scenario 2 -- Bob wants to be super user
 ----------------------------------------
-The dev chain (and the slightly customized chain we just created) includes the sudo module. sudo allows a single user, the "super user" to execute extrinsics with higher authority than usual. Essentially whoever is the super-user is the king of the blockchain. This module is super useful for building and debugging a blockchain, but not a great governance strategy in a public chain. Since we have it, let's use it as an example proposal.
+The dev chain (and the slightly customized chain we just created) includes the sudo module. sudo allows a single user, the "super user" to execute extrinsics with higher authority than usual. Essentially whoever is the super-user is the king of the blockchain. This module is super useful for building and debugging a blockchain, but not a great governance strategy in a public chain. Since we have sudo, let's use it in an example.
 
-When the chain is launched, Alice is the super user. Bob, thinking he would be a better super user than Alice, proposes that he be the new super user. some of his friends think that's a good idea.
+remember to purge your chain, generate the raw chainspec, and start with the proper flags. Review the [intro](SubstrateIntro.md) if necessary.
 
-### Referendum Outvoted
-This is just a simple exercise.
+### Referendum Passes
+When the chain is launched, Alice is the super user. Bob, thinking he would be a better super user than Alice, proposes that he be the new super user. Some of his friends think that's a good idea. The timing diagram is similar to above, but because we've changed our the public delay, the passed referendum is not enacted immediately.
 
-### Alice cancels referendum
+![timing diagram](timing/4.png)
+
+If you have the patience, it is usually insightful to play with the ui, and running scenarios is a good way to do it. If you're bored with that, then read on.
+
+### Exercise: Alice cancels referendum
 by using her existing sudo capabilities
 
-### Over 50% support, but motion fails due to turnout bias
-Bob votes Aye, Charlie votes Nay, charlie has 51% vote, but turnout bias means motion fails anyway.
+![timing diagram](timing/5.png)
 
-Future Content
+Automating Scenarios
+--------------------
+For all the reasons we discussed earlier, always using the UI interactively is tiresome and error-prone. We can automate scenarios like these by using the same polkadot-js api that we used in the introduction. While we won't dwell on this automation, here is an example of the previous scenario.
+
+```javascript
+//TODO Write this together during peer-learning session
+```
+
+
+### Exercise: Low turnout
+In this final exercise, you should construct a scenario, using the interface or javascript, in which a referendum has (just) over 50% voter support, but does not pas due to low voter turnout. It may help to check out the rust code that [implements turnout biasing](https://github.com/paritytech/substrate/blob/master/srml/democracy/src/vote_threshold.rs#L79-L90).
+
+Future Content / Blockers to Fix
 --------------
 * Fix how the UI shows vote weights
 * Add interface elements for delegation
