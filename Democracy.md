@@ -1,9 +1,7 @@
 Democracy Module
 ================
 
-IMPORTANT: You're Invited
-----------------
-Joshy Orndorff will host a live peer-learning sessions that covers and experiments with the democracy module on Friday March 29th for anyone interested in attending.
+This content was covered in a peer learning session on 29 March 2019. Video recording coming soon.
 
 Overview
 --------
@@ -139,10 +137,81 @@ by using her existing sudo capabilities
 
 Automating Scenarios
 --------------------
-For all the reasons we discussed earlier, always using the UI interactively is tiresome and error-prone. We can automate scenarios like these by using the same polkadot-js api that we used in the introduction. While we won't dwell on this automation, here is an example of the previous scenario.
+For all the reasons we discussed earlier, always using the UI interactively is tiresome and error-prone. We can automate scenarios like these by using the same polkadot-js api that we used in the introduction. While we won't dwell on this automation, here is an example automated scenario.
 
 ```javascript
-//TODO Write this together during peer-learning session
+#! /usr/bin/env node
+
+const { ApiPromise } = require('@polkadot/api');
+const { Keyring } = require('@polkadot/keyring');
+
+// https://polkadot.js.org/api/METHODS_STORAGE.html#democracy
+// https://polkadot.js.org/api/METHODS_EXTRINSICS.html#democracy
+// https://polkadot.js.org/api/METHODS_EVENTS.html#democracy
+
+// Main function necessary so we can use `await` inside
+async function main() {
+
+  // Create instances of the API (connected to local node) and keyring.
+  const api = await ApiPromise.create();
+  const keyring = new Keyring();
+
+  // Identities we'll use
+  // ATM this gives the old ED25519 keys without 2nd and 3rd parameters.
+
+
+  const alice = keyring.addFromUri('//Alice', {}, 'sr25519');
+  const bob   = keyring.addFromUri('//Bob', {}, 'sr25519');
+  const charlie = keyring.addFromUri('//Charlie', {}, 'sr25519');
+  console.log("Alice's address is " + alice.address());
+  console.log("Bob's address is " + bob.address());
+  console.log("Charlie's address is " + charlie.address());
+
+  // ISSUE: copying Charlie's address from the ui didn't work. see https://github.com/polkadot-js/apps/issues/872
+  // ExtError: Decoding 5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS3gV: Invalid decoded address checksum
+  //const charlieAddr = '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS3gV';
+
+  // Make sure both alice and bob have funds
+  //TODO set balances
+
+  // Alice makes a proposal to burn Charlie's funds,
+  // and supports it with 2000 tokens.
+  const proposal = api.tx.balances.setBalance(charlie.address(), 0, 0);
+  const aliceMotion = api.tx.democracy.propose(proposal, 2000);
+  const motionHash = await aliceMotion.signAndSend(alice);
+  console.log(`Receipt for Alice's motion: ${motionHash.toHex()}`);
+
+  // Bob seconds
+  // TODO How do I get the index of my proposal after the fact?
+  // Maybe record what it is right before I submit the transaction?
+  // But that doesn't guarantee anything
+  const secondHash = await api.tx.democracy.second(0).signAndSend(bob);
+  console.log(`Receipt for Bob's second: ${secondHash.toHex()}`);
+
+  // Bob delegates to Alice
+  //TODO
+
+  // Wait for proposal to be tabled
+  //TODO
+
+  // Alice votes Aye
+  //await api.tx.democracy.vote(0, true).signAndSend(alice);
+
+  // Charlie votes Nay
+  //TODO
+
+  // Wait for referendum to close
+  //TODO
+
+  // Tally votes? Check vote tally?
+  //TODO
+
+  // Check whether referendum passed
+  //TODO
+}
+
+// Call main
+main().catch(console.error).finally(() => process.exit());
 ```
 
 
