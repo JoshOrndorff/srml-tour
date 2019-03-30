@@ -1,7 +1,7 @@
 Democracy Module
 ================
 
-This content was covered in a peer learning session on 29 March 2019. Video recording coming soon.
+This content was covered in a peer learning session on 29 March 2019 ([video recording](https://youtu.be/1xw_4R_HmCU)).
 
 Overview
 --------
